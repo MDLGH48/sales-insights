@@ -83,7 +83,7 @@ def combine_good_cols(row):
     for k, v in row.items():
         if v == 1:
             good_cols.append(k)
-    return " | ".join(good_cols)
+    return str(good_cols)
 
 
 def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="email", trash_col="Unnamed", **kwargs):
@@ -91,25 +91,34 @@ def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="emai
     train_csv, predict_csv = pd.read_csv(train_csv), pd.read_csv(predict_csv)
     clean_cols_train = [col for col in train_csv.columns if trash_col not in col]
     train_df = train_csv[clean_cols_train]
-    predict_input = Classifier(predict_csv[train_df.columns], y, ir_col, test_size=None).get_inputs()["X"]
+    # saving input_x Obj for later in case we need it for decision function
+    input_x = Classifier(predict_csv[train_df.columns], y, ir_col, test_size=None).get_inputs()["X"]
+    # this will be response df turned into dictionary
+    predict_input_df = input_x
     train_obj = Classifier(train_df, y, ir_col, test_size)
     svm_obj = train_obj.svm_predict()
     svm_model = svm_obj["svm_model"]
     svm_model_accuracy = svm_obj["accuracy"]
     if kwargs.get("mode") == "predict":
-        pred = svm_model.predict(predict_input)
-        predict_input[[f"predicted_{y}"]] = pred
-        return predict_input.to_dict(orient="records")
+        input_prediction = svm_model.predict(predict_input_df)
+        predict_input_df[[f"predicted_{y}"]] = input_prediction
+        return predict_input_df.to_dict(orient="records")
     else:
-        decision_func = svm_model.decision_function(predict_input)
-        pred = svm_model.predict_proba(predict_input)
-        predict_input[[f"prob_yes_{y}"]], predict_input[[f"prob_no_{y}"]] = [prob[1] for prob in pred], [prob[0] for
-                                                                                                         prob in pred]
-        predict_input["action_group"] = predict_input.apply(
+        input_prediction = svm_model.predict_proba(predict_input_df)
+        predict_input_df[[f"prob_yes_{y}"]], predict_input_df[[f"prob_no_{y}"]] = [prob[1] for prob in
+                                                                                   input_prediction], [prob[0] for prob
+                                                                                                       in
+                                                                                                       input_prediction]
+        predict_input_df["action_group"] = predict_input_df.apply(
             lambda x: combine_good_cols(x[train_obj.get_inputs()["X"].columns]), axis=1)
         prob_col = f'{kwargs.get("prob_col")}_{y}'
-        prob_df = predict_input.groupby("action_group").mean().sort_values(by=prob_col, ascending=False)[[f"prob_yes_{y}",
-                                                                                                          f"prob_no_{y}"]]
-        return {"model_accuracy": svm_model_accuracy,
-                "decision_eval": list(decision_func),
-                "results": prob_df.reset_index(level="action_group").to_dict(orient="records")}
+        prob_df = predict_input_df.groupby("action_group").mean().sort_values(by=prob_col, ascending=False)[
+            [f"prob_yes_{y}",
+             f"prob_no_{y}"]]
+        model_output = {"model_accuracy": svm_model_accuracy,
+                        "results": prob_df.reset_index(level="action_group").to_dict(orient="records")}
+        # if needed get decision array --> need to reshape
+        if kwargs.get("decision"):
+            model_output["decision_eval"] = list(svm_model.decision_function(input_x))
+
+        return model_output
