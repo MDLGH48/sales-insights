@@ -72,7 +72,7 @@ class Classifier:
         y_train = test_train["y_train"]
         X_test = test_train["X_test"]
         y_test = test_train["y_test"]
-        svm_model = svm.SVC(kernel='rbf', gamma=4, probability=True, **kwargs)
+        svm_model = svm.SVC(kernel=kernel, gamma=gamma, probability=probability, **kwargs)
         svm_model.fit(X_train, y_train)
         yhat = svm_model.predict(X_test)
         return {"svm_model": svm_model, "svm_yhat": yhat, "accuracy": metrics.accuracy_score(y_test, yhat)}
