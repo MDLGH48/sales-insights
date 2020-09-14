@@ -1,6 +1,4 @@
-# todo pep8
 # todo logging
-# todo queryGroup
 # todo makeFaster (caching?)
 
 import pandas as pd
@@ -18,22 +16,23 @@ def main():
     return "main"
 
 
-@app.post("/prediction_probs/{y}")
-def prediction_probs(y: str,
-                     train_csv: UploadFile = File(...),
-                     predict_csv: UploadFile = File(...)):
-    pred_dict = train_predict_svm_io(train_csv.file, predict_csv.file, y, train_size=0.9, ir_col="email",
+@app.post("/prediction")
+def prediction(metric: str,
+               train_csv: UploadFile = File(...),
+               predict_csv: UploadFile = File(...)):
+    pred_dict = train_predict_svm_io(train_csv.file, predict_csv.file, metric, train_size=0.9, ir_col="email",
                                      trash_col="Unnamed",
                                      prob_col="prob_yes")
     return {
         "response": pred_dict
     }
 
-@app.post("/get_corr/{y}")
-def get_corr(y: str,
-             input_csv: UploadFile = File(...)):
-    classifier_obj = Classifier(df = pd.read_csv(input_csv.file),
-                                y=y,
+
+@app.post("/corr")
+def corr(metric: str,
+         input_csv: UploadFile = File(...)):
+    classifier_obj = Classifier(df=pd.read_csv(input_csv.file),
+                                y=metric,
                                 ir_col="email",
                                 test_size=None)
     return {
