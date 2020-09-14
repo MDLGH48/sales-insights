@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy import stats
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.neighbors import KNeighborsClassifier
@@ -22,13 +23,28 @@ class Classifier:
         y = df[y].values
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=self.test_size)
-        # print ('Train set:', X_train.shape,  y_train.shape)
-        # print ('Test set:', X_test.shape,  y_test.shape)
         return {"X_train": X_train,
                 "X_test": X_test,
                 "y_train": y_train,
                 "y_test": y_test,
-                "X": X}
+                "X": X,
+                "y":y}
+
+    def get_corr(self):
+        full_df_obj = self.get_inputs()
+        X = full_df_obj["X"]
+        y = full_df_obj["y"]
+        y_col = self.y
+        corr_list = []
+        Xcols = []
+        for col in X.columns:
+            corr_list.append(stats.pointbiserialr(list(X[col].values), list(y)).correlation)
+            Xcols.append(col)
+        corr_df = pd.DataFrame({"metric": Xcols,
+                                "correlation": corr_list,
+                                "target": [y_col] * len(Xcols)}).sort_values(by="correlation", ascending=False)
+        return corr_df.to_dict(orient="records")
+
 
     def knn_best(self, Ks):
         test_train = self.get_inputs()
@@ -86,8 +102,7 @@ def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="emai
         return predict_input.to_dict(orient="records")
     else:
         pred = svm_model.predict_proba(predict_input)
-        predict_input[[f"prob_yes_{y}"]], predict_input[[f"prob_no_{y}"]] = [prob[1] for prob in pred], [prob[0] for
-                                                                                                         prob in pred]
+        predict_input[[f"prob_yes_{y}"]], predict_input[[f"prob_no_{y}"]] = [prob[1] for prob in pred], [prob[0] for prob in pred]
         predict_input["action_group"] = predict_input.apply(
             lambda x: combine_good_cols(x[train_obj.get_inputs()["X"].columns]), axis=1)
         prob_col = f'{kwargs.get("prob_col")}_{y}'

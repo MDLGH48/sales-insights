@@ -1,10 +1,11 @@
 # todo pep8
 # todo logging
-#
+# todo queryGroup
+# todo makeFaster (caching?)
 
 import pandas as pd
 from fastapi import FastAPI, Body, File, UploadFile
-from classify import train_predict_svm_io
+from classify import Classifier, train_predict_svm_io
 import json
 import time
 
@@ -26,4 +27,15 @@ def prediction_probs(y: str,
                                      prob_col="prob_yes")
     return {
         "response": pred_dict
+    }
+
+@app.post("/get_corr/{y}")
+def get_corr(y: str,
+             input_csv: UploadFile = File(...)):
+    classifier_obj = Classifier(df = pd.read_csv(input_csv.file),
+                                y=y,
+                                ir_col="email",
+                                test_size=None)
+    return {
+        "response": classifier_obj.get_corr()
     }
