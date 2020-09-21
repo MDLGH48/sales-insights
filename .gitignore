@@ -2,7 +2,7 @@
 # You should customize this list as applicable to your project.
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
-
+auth.py
 # Node artifact files
 node_modules/
 dist/
@@ -187,4 +187,4 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-dealenv/
+dealenv2/

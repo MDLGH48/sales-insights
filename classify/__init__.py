@@ -4,7 +4,9 @@ from scipy import stats
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm
+import ppscore as pps
 
 
 class Classifier:
@@ -30,20 +32,38 @@ class Classifier:
                 "X": X,
                 "y": y}
 
+    def get_predictors(self):
+        df = self.df
+        return pps.predictors(
+            df[[col for col in df.columns if col != self.ir_col]],
+            self.y)[['x', 'y', 'ppscore']].to_dict(orient="records")
+
+
     def get_corr(self):
         full_df_obj = self.get_inputs()
         X = full_df_obj["X"]
         y = full_df_obj["y"]
         y_col = self.y
-        corr_list = []
+        tree_info = list(DecisionTreeClassifier().fit(X,y).feature_importances_)
+        ptb_corr_list = []
+        phi_list = []
+        p_list = []
         Xcols = []
+        index = 0
         for col in X.columns:
-            corr_list.append(stats.pointbiserialr(list(X[col].values), list(y)).correlation)
+            pbs = stats.pointbiserialr(list(X[col].values), list(y))
+            phi = metrics.matthews_corrcoef(list(X[col].values), list(y))
+            ptb_corr_list.append(pbs.correlation)
+            phi_list.append(phi)
+            p_list.append(pbs.pvalue)
             Xcols.append(col)
-        corr_df = pd.DataFrame({"metric": Xcols,
-                                "correlation": corr_list,
-                                "target": [y_col] * len(Xcols)}).sort_values(by="correlation", ascending=False)
-        return corr_df.to_dict(orient="records")
+        return pd.DataFrame({"metric": Xcols,
+                                "importance":tree_info,
+                                "phi_correlation":phi_list,
+                                "biserial_correlation": ptb_corr_list,
+                                "p_value":p_list,
+                                "target": [y_col] * len(Xcols)}).sort_values(by="phi_correlation", ascending=False).to_dict(orient="records")
+
 
     def knn_best(self, ks):
         test_train = self.get_inputs()

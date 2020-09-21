@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+    {% block title %}Main {% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+    <div id="root"></div>
+    {% block javascript %}
+    <script type="text/babel" src = "{{ url_for('static', path='index.js') }}" />
+    {% endblock %}
+{% endblock %}
