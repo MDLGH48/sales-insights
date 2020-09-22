@@ -1,0 +1,10 @@
+image: python:3.7.2
+pipelines:
+  default:
+    - step:
+      script:
+          - pip install -r requirements.txt
+    - step:
+      script:
+        - pep8 app
+	
