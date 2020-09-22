@@ -1,3 +1,1 @@
-cd ./app
-
-uvicorn app:app --reload
+uvicorn main:app --reload
