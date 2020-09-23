@@ -1,12 +1,24 @@
 # todo logging
 # todo makeFaster (caching?)
-
+import json
+from typing import Optional, List
 import pandas as pd
 from fastapi import FastAPI, Body, File, UploadFile, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from classify import Classifier, train_predict_svm_io
+from classify.test import create_random_df, train_predict_svm_test
+from pydantic import BaseModel
+
+
+class TestRandom(BaseModel):
+    train: int
+    pred: int
+    metrics: List[str]
+    target: str
+    trash: Optional[str] = None
+
 
 app = FastAPI(title='FastDeal', version='1.0',
               description='analytics api')
@@ -18,6 +30,12 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 def main(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.post("/test/prediction")
+def test(testObj: TestRandom):
+    print(dict(testObj))
+    return train_predict_svm_test(**dict(testObj))
 
 
 @app.post("/prediction")

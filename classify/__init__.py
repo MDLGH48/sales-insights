@@ -49,7 +49,6 @@ class Classifier:
         phi_list = []
         p_list = []
         Xcols = []
-        index = 0
         for col in X.columns:
             pbs = stats.pointbiserialr(list(X[col].values), list(y))
             phi = metrics.matthews_corrcoef(list(X[col].values), list(y))
@@ -108,7 +107,6 @@ def combine_good_cols(row):
 
 def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="email", trash_col="Unnamed", **kwargs):
     test_size = 1 - train_size
-    train_csv, predict_csv = pd.read_csv(train_csv), pd.read_csv(predict_csv)
     clean_cols_train = [
         col for col in train_csv.columns if trash_col not in col]
     train_df = train_csv[clean_cols_train]
@@ -145,3 +143,11 @@ def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="emai
                 svm_model.decision_function(input_x))
 
         return model_output
+
+
+def svm_predict_test(X_train, y_train, X_test, y_test, kernel="rbf", gamma=4, probability=True, **kwargs):
+    svm_model = svm.SVC(kernel=kernel, gamma=gamma,
+                        probability=probability, **kwargs)
+    svm_model.fit(X_train, y_train)
+    yhat = svm_model.predict(X_test)
+    return {"svm_model": svm_model, "svm_yhat": yhat, "accuracy": metrics.accuracy_score(y_test, yhat)}

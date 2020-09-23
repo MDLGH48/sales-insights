@@ -1,3 +1,4 @@
+// const BASE_URL = "https://localhost:8000";
 const { useState } = React;
 const {
   AppBar,
@@ -9,6 +10,8 @@ const {
   Button,
   TextField,
   Menu,
+  List,
+  ListItem,
   MenuItem,
   Grid,
   Container,
@@ -16,17 +19,9 @@ const {
   Link,
   Slider,
 } = MaterialUI;
-function MenuIcon(props) {
-  return (
-    <SvgIcon {...props}>
-      <path d="m368 154.667969h-352c-8.832031 0-16-7.167969-16-16s7.167969-16 16-16h352c8.832031 0 16 7.167969 16 16s-7.167969 16-16 16zm0 0" />
-      <path d="m368 32h-352c-8.832031 0-16-7.167969-16-16s7.167969-16 16-16h352c8.832031 0 16 7.167969 16 16s-7.167969 16-16 16zm0 0" />
-      <path d="m368 277.332031h-352c-8.832031 0-16-7.167969-16-16s7.167969-16 16-16h352c8.832031 0 16 7.167969 16 16s-7.167969 16-16 16zm0 0" />
-    </SvgIcon>
-  );
-}
+
 const useStyles = makeStyles((theme) => ({
-  root: { flexGrow: 1 },
+  root: { flexGrow: 1, textAlign: "center" },
   menuButton: { marginRight: theme.spacing(2) },
   title: { flexGrow: 1 },
   menuIcon: {
@@ -34,26 +29,74 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
 }));
-function valuetext(value) {
-  return `${value}`;
-}
+
+const postRequest = async (url, payload) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: url,
+      data: payload,
+    });
+    console.log(response);
+    const responseData = response.data;
+    console.log(responseData);
+    return responseData;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 function App() {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [trainSize, setTrainSize] = useState(1000);
-  const [predSize, setPredSize] = useState(1000);
-  const handleTrainSliderChange = (event, newValue) => {
-    setTrainSize(newValue);
-  };
-  const handlePredSliderChange = (event, newValue) => {
-    setPredSize(newValue);
-  };
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+  //  I should probably use objects to handle state here... will change
+  const [trainSize, setTrainSize] = useState(1000);
+  const [predSize, setPredSize] = useState(1000);
+  const [metrics, setMetrics] = useState([
+    "hubspot_contact_paid_search",
+    "hubspot_contact_direct_traffic",
+    "hubspot_contact_paid_social",
+    "hubspot_contact_webinar",
+    "hubspot_contact_zoom_marketplace",
+    "hubspot_contact_organic_search",
+    "hubspot_contact_qualified",
+    "hubspot_email_open",
+    "salesforce_opportunity",
+  ]);
+  const [target, setTarget] = useState("salesforce_opportunity");
+
+  const getPrediction = async () => {
+    const payload = {
+      train: trainSize,
+      pred: predSize,
+      metrics: metrics,
+      target: target,
+    };
+    console.log(payload);
+    const resp = await postRequest("/test/prediction", payload);
+  };
+
+  // need to make more generic.. same function over again
+  const handleTrainSliderChange = (event, newVal) => {
+    setTrainSize(newVal);
+  };
+  const handlePredSliderChange = (event, newVal) => {
+    setPredSize(newVal);
+  };
+  const handleMetrics = (event) => {
+    const newArray = event.target.value;
+    setMetrics([newArray]);
+  };
+  const handleTarget = (event) => {
+    setTarget(event.target.value);
+  };
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -90,17 +133,20 @@ function App() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="xs">
+      <Container maxWidth="sm">
         <Grid
           container
-          spacing={0}
-          direction="column"
+          spacing={3}
+          direction="row"
           alignItems="center"
           justify="center"
-          style={{ minHeight: "40vh" }}>
-          <Grid item xs={9}>
+          style={{ minHeight: "40vh", marginTop: "5vh" }}>
+          <Grid item sm={12}>
             <Box display="flex" justifyContent="center" flexWrap="wrap">
-              <Typography>Training Dataset Size {trainSize}</Typography>
+              <Typography>
+                Training Dataset Size ={" "}
+                <b style={{ color: "red" }}>{trainSize}</b>
+              </Typography>
 
               <Slider
                 value={trainSize}
@@ -111,7 +157,10 @@ function App() {
               />
             </Box>
             <Box display="flex" justifyContent="center" flexWrap="wrap">
-              <Typography>Prediction Dataset Size {predSize}</Typography>
+              <Typography>
+                Prediction Dataset Size ={" "}
+                <b style={{ color: "red" }}>{predSize}</b>
+              </Typography>
 
               <Slider
                 value={predSize}
@@ -121,17 +170,48 @@ function App() {
                 aria-labelledby="input-slider"
               />
             </Box>
+          </Grid>
+          <Grid item sm={12} style={{ padding: "20px" }}>
             <Box display="flex" justifyContent="center" flexWrap="wrap">
-              <Typography>Amount of Metrics</Typography>
-
-              <Slider
-                value={Xsize}
-                min={2}
-                max={15}
-                onChange={handleXSliderChange}
-                aria-labelledby="input-slider"
-              />
+              <Typography>Metrics</Typography>
+              <TextField
+                variant="outlined"
+                style={{ width: "60vw" }}
+                value={metrics}
+                onChange={handleMetrics}></TextField>
+              {/* <List>
+                  metrics
+                </List> */}
             </Box>
+            <Box
+              display="flex"
+              justifyContent="center"
+              flexWrap="wrap"
+              style={{ padding: "20px" }}>
+              <TextField
+                value={target || ""}
+                style={{ width: "30vw" }}
+                label="target"
+                onChange={handleTarget}></TextField>
+            </Box>
+            <Box
+              display="flex"
+              justifyContent="center"
+              flexWrap="wrap"
+              style={{ padding: "20px" }}></Box>
+            <Grid item sm={12} style={{ padding: "20px" }}>
+              <Box display="flex" justifyContent="center" flexWrap="wrap">
+                <Button
+                  variant="contained"
+                  size="large"
+                  color="primary"
+                  onClick={getPrediction}
+                  // href={`test/prediction?train=${trainSize}&pred=${predSize}&metrics=${metrics}&target=${target}&trash=${trash}`}
+                >
+                  GO
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
         </Grid>
       </Container>
