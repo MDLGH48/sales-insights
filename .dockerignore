@@ -1,0 +1,7 @@
+dealenv2
+.dockerignore
+.gitignore
+run.sh
+Dockerfile
+**/__pycache__
+*.pyc

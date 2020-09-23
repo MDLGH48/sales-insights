@@ -8,6 +8,7 @@ joblib==0.16.0
 MarkupSafe==1.1.1
 numpy==1.19.2
 pandas==1.1.2
+ppscore==1.1.1
 pydantic==1.6.1
 python-dateutil==2.8.1
 python-multipart==0.0.5
@@ -21,4 +22,3 @@ threadpoolctl==2.1.0
 uvicorn==0.11.8
 uvloop==0.14.0
 websockets==8.1
-pycodestyle

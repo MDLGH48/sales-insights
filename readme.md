@@ -21,9 +21,9 @@
 - install virtual env
   - `$ virtualenv myenv`
 - activate virtual env
-- `$ source myenv/bin/activate`
+  - `$ source myenv/bin/activate`
 - install packages in virtual env
-- `$ pip install -r requirements.txt`
+  - `$ pip install -r requirements.txt`
 - for local running:
   - from root of project dir `$ sh run.sh`
 
