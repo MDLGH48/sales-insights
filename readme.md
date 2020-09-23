@@ -2,10 +2,10 @@
 
 ## Built with
 
-- FastApi https://fastapi.tiangolo.com/
-- pandas https://pandas.pydata.org/
-- scikitlearn https://scikit-learn.org/stable/
-- SciPy https://scikit-learn.org/stable/
+- [FastApi] (https://fastapi.tiangolo.com/)
+- [pandas] (https://pandas.pydata.org/)
+- [scikitlearn] (https://scikit-learn.org/stable/)
+- [SciPy] (https://scikit-learn.org/stable/)
 
 ## description
 
