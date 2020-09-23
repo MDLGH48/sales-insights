@@ -38,13 +38,13 @@ class Classifier:
             df[[col for col in df.columns if col != self.ir_col]],
             self.y)[['x', 'y', 'ppscore']].to_dict(orient="records")
 
-
     def get_corr(self):
         full_df_obj = self.get_inputs()
         X = full_df_obj["X"]
         y = full_df_obj["y"]
         y_col = self.y
-        tree_info = list(DecisionTreeClassifier().fit(X,y).feature_importances_)
+        tree_info = list(DecisionTreeClassifier().fit(
+            X, y).feature_importances_)
         ptb_corr_list = []
         phi_list = []
         p_list = []
@@ -58,12 +58,11 @@ class Classifier:
             p_list.append(pbs.pvalue)
             Xcols.append(col)
         return pd.DataFrame({"metric": Xcols,
-                                "importance":tree_info,
-                                "phi_correlation":phi_list,
-                                "biserial_correlation": ptb_corr_list,
-                                "p_value":p_list,
-                                "target": [y_col] * len(Xcols)}).sort_values(by="phi_correlation", ascending=False).to_dict(orient="records")
-
+                             "importance": tree_info,
+                             "phi_correlation": phi_list,
+                             "biserial_correlation": ptb_corr_list,
+                             "p_value": p_list,
+                             "target": [y_col] * len(Xcols)}).sort_values(by="phi_correlation", ascending=False).to_dict(orient="records")
 
     def knn_best(self, ks):
         test_train = self.get_inputs()
@@ -92,7 +91,8 @@ class Classifier:
         y_train = test_train["y_train"]
         X_test = test_train["X_test"]
         y_test = test_train["y_test"]
-        svm_model = svm.SVC(kernel=kernel, gamma=gamma, probability=probability, **kwargs)
+        svm_model = svm.SVC(kernel=kernel, gamma=gamma,
+                            probability=probability, **kwargs)
         svm_model.fit(X_train, y_train)
         yhat = svm_model.predict(X_test)
         return {"svm_model": svm_model, "svm_yhat": yhat, "accuracy": metrics.accuracy_score(y_test, yhat)}
@@ -109,10 +109,12 @@ def combine_good_cols(row):
 def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="email", trash_col="Unnamed", **kwargs):
     test_size = 1 - train_size
     train_csv, predict_csv = pd.read_csv(train_csv), pd.read_csv(predict_csv)
-    clean_cols_train = [col for col in train_csv.columns if trash_col not in col]
+    clean_cols_train = [
+        col for col in train_csv.columns if trash_col not in col]
     train_df = train_csv[clean_cols_train]
     # saving input_x Obj for later in case we need it for decision function
-    input_x = Classifier(predict_csv[train_df.columns], y, ir_col, test_size=None).get_inputs()["X"]
+    input_x = Classifier(
+        predict_csv[train_df.columns], y, ir_col, test_size=None).get_inputs()["X"]
     # this will be response df turned into dictionary
     predict_input_df = input_x
     train_obj = Classifier(train_df, y, ir_col, test_size)
@@ -139,6 +141,7 @@ def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="emai
                         "results": prob_df.reset_index(level="action_group").to_dict(orient="records")}
         # if needed get decision array --> need to reshape
         if kwargs.get("decision"):
-            model_output["decision_eval"] = list(svm_model.decision_function(input_x))
+            model_output["decision_eval"] = list(
+                svm_model.decision_function(input_x))
 
         return model_output
