@@ -1,5 +1,12 @@
 # Dealtale api
 
+## Built with
+
+- FastApi https://fastapi.tiangolo.com/
+- pandas https://pandas.pydata.org/
+- scikitlearn https://scikit-learn.org/stable/
+- SciPy https://scikit-learn.org/stable/
+
 ## description
 
 ### 1. **_measure the correlation/importance of relationship between each `metric X` and `target Y ` for one-hot encoded dataset (0,1)_** using
