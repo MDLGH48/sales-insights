@@ -17,11 +17,6 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 def main(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-
-@app.get("/login", response_class=HTMLResponse)
-def login(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
