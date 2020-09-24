@@ -38,8 +38,8 @@ def test_prediction_io():
                 "filename",
                 test_p,
                 "csv")})
-    os.remove('tests_and_format/pytest_data/test_t.csv')
-    os.remove('tests_and_format/pytest_data/test_p.csv')
+    # os.remove('tests_and_format/pytest_data/test_t.csv')
+    # os.remove('tests_and_format/pytest_data/test_p.csv')
     assert response.status_code == 200
 
 
@@ -55,5 +55,5 @@ def test_corr_io():
                     'tests_and_format/pytest_data/test_input.csv',
                     'rb'),
                 "csv")})
-    os.remove('tests_and_format/pytest_data/test_input.csv')
+    # os.remove('tests_and_format/pytest_data/test_input.csv')
     assert response.status_code == 200
