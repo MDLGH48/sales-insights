@@ -5,5 +5,6 @@ pipelines:
         script:
           - pip install -r requirements.txt
           - pytest test.py
-          - pycodestyle --exclude='venv,dealenv,dealenv2' .
+          - python
+          - pycodestyle --exclude='venv,dealenv,dealenv2' --ignore E501 .
           

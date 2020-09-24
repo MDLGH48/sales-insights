@@ -6,7 +6,8 @@ from . import svm_predict_test, combine_good_cols
 
 
 def random_char(y):
-    return ''.join(random.choice(string.ascii_letters) for x in range(y))
+    return ''.join(random.choice(string.ascii_letters)
+                   for x in range(y))
 
 
 def create_random_df(size, Xcols, ycol):
@@ -16,7 +17,8 @@ def create_random_df(size, Xcols, ycol):
     for col in Xcols:
         fake_df[col] = list(np.random.choice(
             [1, 0], df_size, p=[3 / 7, 4 / 7]))
-    fake_df[ycol] = list(np.random.choice([1, 0], df_size, p=[3 / 7, 4 / 7]))
+    fake_df[ycol] = list(np.random.choice(
+        [1, 0], df_size, p=[3 / 7, 4 / 7]))
     return fake_df
 
 
@@ -39,7 +41,8 @@ def train_predict_svm_test(train, pred, metrics, target, **kwargs):
         test_frac[target])
     svm_model = svm_obj["svm_model"]
     svm_model_accuracy = svm_obj["accuracy"]
-    prediction_probabilities = svm_model.predict_proba(predict_df[metrics])
+    prediction_probabilities = svm_model.predict_proba(
+        predict_df[metrics])
     predict_df[[f"prob_yes_{target}"]] = [prob[1]
                                           for prob in prediction_probabilities]
     predict_df[[f"prob_no_{target}"]] = [prob[0]
@@ -47,7 +50,8 @@ def train_predict_svm_test(train, pred, metrics, target, **kwargs):
     predict_df["action_group"] = predict_df.apply(
         lambda x: combine_good_cols(x[predict_df[metrics].columns]), axis=1)
     prob_df = predict_df.groupby("action_group").mean().sort_values(
-        by=f"prob_yes_{target}", ascending=False)[[f"prob_yes_{target}", f"prob_no_{target}"]]
+        by=f"prob_yes_{target}", ascending=False)[
+        [f"prob_yes_{target}", f"prob_no_{target}"]]
     model_output = {
         "model_accuracy": svm_model_accuracy,
         "results": prob_df.reset_index(

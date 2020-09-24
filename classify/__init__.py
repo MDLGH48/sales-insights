@@ -51,7 +51,8 @@ class Classifier:
         Xcols = []
         for col in X.columns:
             pbs = stats.pointbiserialr(list(X[col].values), list(y))
-            phi = metrics.matthews_corrcoef(list(X[col].values), list(y))
+            phi = metrics.matthews_corrcoef(
+                list(X[col].values), list(y))
             ptb_corr_list.append(pbs.correlation)
             phi_list.append(phi)
             p_list.append(pbs.pvalue)
@@ -63,11 +64,9 @@ class Classifier:
                 "phi_correlation": phi_list,
                 "biserial_correlation": ptb_corr_list,
                 "p_value": p_list,
-                "target": [y_col] *
-                len(Xcols)}).sort_values(
+                "target": [y_col] * len(Xcols)}).sort_values(
             by="phi_correlation",
-            ascending=False).to_dict(
-                orient="records")
+            ascending=False).to_dict(orient="records")
 
     def knn_best(self, ks):
         test_train = self.get_inputs()
@@ -79,10 +78,13 @@ class Classifier:
         std_acc = np.zeros((ks - 1))
         for n in range(1, ks):
             # Train Model and Predict
-            neigh = KNeighborsClassifier(n_neighbors=n).fit(X_train, y_train)
+            neigh = KNeighborsClassifier(
+                n_neighbors=n).fit(
+                X_train, y_train)
             yhat = neigh.predict(X_test)
             mean_acc[n - 1] = metrics.accuracy_score(y_test, yhat)
-            std_acc[n - 1] = np.std(yhat == y_test) / np.sqrt(yhat.shape[0])
+            std_acc[n - 1] = np.std(yhat == y_test) / \
+                np.sqrt(yhat.shape[0])
         kn = mean_acc.argmax() + 1
         knn = KNeighborsClassifier(n_neighbors=kn).fit(X_train, y_train)
         yhat = knn.predict(X_test)
@@ -90,7 +92,12 @@ class Classifier:
             f"The best accuracy was with {mean_acc.max()} -->model: {kn} neighbors")
         return {"knn_model": knn, "knn_yhat": yhat}
 
-    def svm_predict(self, kernel="rbf", gamma=4, probability=True, **kwargs):
+    def svm_predict(
+            self,
+            kernel="rbf",
+            gamma=4,
+            probability=True,
+            **kwargs):
         test_train = self.get_inputs()
         X_train = test_train["X_train"]
         y_train = test_train["y_train"]
@@ -130,9 +137,11 @@ def train_predict_svm_io(
     clean_cols_train = [
         col for col in train_csv.columns if trash_col not in col]
     train_df = train_csv[clean_cols_train]
-    # saving input_x Obj for later in case we need it for decision function
+    # saving input_x Obj for later in case we need it for decision
+    # function
     input_x = Classifier(
-        predict_csv[train_df.columns], y, ir_col, test_size=None).get_inputs()["X"]
+        predict_csv[train_df.columns],
+        y, ir_col, test_size=None).get_inputs()["X"]
     # this will be response df turned into dictionary
     predict_input_df = input_x
     train_obj = Classifier(train_df, y, ir_col, test_size)
