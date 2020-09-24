@@ -17,13 +17,92 @@
     {% endblock %}
 </head>
 <body> 
+    <div id="nav"></div>
+<script type="text/babel">
+const { useState } = React;
+const {
+  AppBar,
+  IconButton,
+  Toolbar,
+  Typography,
+  makeStyles,
+  Button,
+  Menu,
+  MenuItem,
+  Link,
+} = MaterialUI;
 
+const useStyles = makeStyles((theme) => ({
+  navRoot: { flexGrow: 1, textAlign: "center" },
+  menuButton: { marginRight: theme.spacing(2) },
+  title: { flexGrow: 1 },
+  menuIcon: {
+    flexGrow: 1,
+    marginRight: theme.spacing(1),
+  },
+}));
+
+function NavBar() {
+  const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  return (
+    <div className={classes.navRoot}>
+      <AppBar position="static">
+        <Toolbar>
+          <div>
+            <Button
+              aria-controls="docMenu"
+              aria-haspopup="true"
+              onClick={handleClick}
+              color="inherit">
+              DOCs
+            </Button>
+            <Menu
+              id="docMenu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}>
+              <MenuItem onClick={handleClose}>
+                <Link href="/redoc" target="_blank">
+                  Redoc
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <Link href="/docs" target="_blank">
+                  Swagger
+                </Link>
+              </MenuItem>
+            </Menu>
+          </div>
+
+          <Typography variant="h6" align="center" className={classes.title}>
+            API Test
+          </Typography>
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
+}
+ReactDOM.render(
+  <React.Fragment>
+    <NavBar />
+  </React.Fragment>,
+  document.querySelector("#nav")
+);
+</script>
 
 
 
 {% block content %}    
 
-    {% endblock %}
+{% endblock %}
 
 </body>
 </html>

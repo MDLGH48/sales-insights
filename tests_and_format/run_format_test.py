@@ -10,7 +10,8 @@ def pep8_this_app(directories):
                 pycode_stream = os.popen(
                     f'pycodestyle --show-source --show-pep8 --ignore E501 {file.path}')
                 pycode_log = pycode_stream.read()
-                print(pycode_log)
+                if pycode_log == "":
+                    print(f" {file.path} pycode style is ok... ignored E501")
 
 
 if __name__ == '__main__':
