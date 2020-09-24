@@ -4,6 +4,6 @@ pipelines:
     - step:
         script:
           - pip install -r requirements.txt
-          - python -m pytest test.py
+          - python3 -m pytest test.py
           - pycodestyle --exclude='venv,dealenv,dealenv2' .
           
