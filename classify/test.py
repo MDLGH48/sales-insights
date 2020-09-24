@@ -43,9 +43,9 @@ def train_predict_svm_test(train, pred, metrics, target, **kwargs):
     svm_model_accuracy = svm_obj["accuracy"]
     prediction_probabilities = svm_model.predict_proba(
         predict_df[metrics])
-    predict_df[[f"prob_yes_{target}"]] = [prob[1]
+    predict_df[[f"prob_yes_{target}"]] = [round(prob[1], 4)
                                           for prob in prediction_probabilities]
-    predict_df[[f"prob_no_{target}"]] = [prob[0]
+    predict_df[[f"prob_no_{target}"]] = [round(prob[0], 4)
                                          for prob in prediction_probabilities]
     predict_df["action_group"] = predict_df.apply(
         lambda x: combine_good_cols(x[predict_df[metrics].columns]), axis=1)

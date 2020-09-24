@@ -1,5 +1,5 @@
 // const BASE_URL = "https://localhost:8000";
-const { useState } = React;
+const { useState, useEffect } = React;
 const {
   Typography,
   makeStyles,
@@ -19,6 +19,15 @@ const {
   Modal,
   Backdrop,
   Fade,
+  CircularProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
 } = MaterialUI;
 
 const useStyles = makeStyles((theme) => ({
@@ -36,14 +45,17 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  paper: {
+  paperModal: {
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
     maxWidth: "70vw",
-    maxHeight: "70vh",
-    overflow: "scroll",
+    // maxHeight: "70vh",
+    // overflow: "scroll",
+  },
+  container: {
+    maxHeight: 600,
   },
 }));
 
@@ -66,8 +78,20 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 function App() {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const handleClose = () => {
     setOpen(false);
   };
@@ -86,18 +110,34 @@ function App() {
     "salesforce_opportunity",
   ]);
   const [target, setTarget] = useState("salesforce_opportunity");
-  const [predData, setPredData] = useState({});
+  const [predData, setPredData] = useState({
+    model_accuraccy: 0,
+    results: [{ action_group: "", prob_yes: "", prob_no: "" }],
+  });
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setSeconds((c) => c + 1);
+    }, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
+
   const getPrediction = async () => {
+    setSeconds(0);
+    setLoading(true);
     const payload = {
       train: trainSize,
       pred: predSize,
       metrics: metrics,
       target: target,
     };
-    console.log(payload);
     const resp = await postRequest("/test/prediction", payload);
-    setOpen(true);
     setPredData(resp);
+    setLoading(false);
+    setOpen(true);
   };
   const [metricInputVal, setMetricInputVal] = useState("");
   // need to make more generic.. same function over again
@@ -221,6 +261,12 @@ function App() {
               flexWrap="wrap"
               style={{ padding: "20px" }}></Box>
             <Grid item sm={12} style={{ padding: "20px" }}>
+              {loading && (
+                <Box>
+                  <Typography>{seconds} seconds</Typography>
+                </Box>
+              )}
+
               <Box display="flex" justifyContent="center" flexWrap="wrap">
                 <Button
                   variant="contained"
@@ -233,7 +279,7 @@ function App() {
             </Grid>
           </Grid>
         </Grid>
-      </Container>
+      </Container>{" "}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -246,8 +292,53 @@ function App() {
           timeout: 500,
         }}>
         <Fade in={open}>
-          <div className={classes.paper}>
-            <Typography>{JSON.stringify(predData)}</Typography>
+          <div className={classes.paperModal}>
+            <TableContainer className={classes.container}>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    {Object.keys(predData.results[0]).map((key) => (
+                      <TableCell key={key.index}>{key}</TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {predData.results
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => {
+                      return (
+                        <TableRow hover tabIndex={-1} key={row.index}>
+                          {Object.keys(predData.results[0]).map((key) => {
+                            const value = row[key];
+                            return (
+                              <TableCell
+                                key={key.index}
+                                align={key.align}
+                                style={{
+                                  color: "black",
+                                  backgroundColor: `rgba(242, 120, 75, ${value})`,
+                                }}>
+                                {key.format && typeof value === "number"
+                                  ? key.format(value)
+                                  : value}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 100]}
+              component="div"
+              count={predData.results.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
           </div>
         </Fade>
       </Modal>
