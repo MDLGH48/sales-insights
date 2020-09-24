@@ -4,5 +4,6 @@ pipelines:
     - step:
         script:
           - pip install -r requirements.txt
-          - /bin/bash format_and_test.sh
+          - pycodestyle --exclude='venv,dealenv,dealenv2' .
+          - pytest test.py
           
