@@ -1,5 +1,6 @@
 import os
 
+
 def pep8_this_app(directories):
     for directory in directories:
         for file in os.scandir(directory):
