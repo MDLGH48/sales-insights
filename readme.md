@@ -2,10 +2,10 @@
 
 ## Built with
 
-- [FastApi] (https://fastapi.tiangolo.com/)
-- [pandas] (https://pandas.pydata.org/)
-- [scikitlearn] (https://scikit-learn.org/stable/)
-- [SciPy] (https://scikit-learn.org/stable/)
+- FastApi <https://fastapi.tiangolo.com/>
+- pandas <https://pandas.pydata.org/>
+- scikitlearn <https://scikit-learn.org/stable/>
+- SciPy <https://docs.scipy.org/doc/scipy/reference/>
 
 ## description
 
@@ -33,8 +33,11 @@
   - `$ pip install -r requirements.txt`
 - for local running:
   - from root of project dir `$ sh run.sh`
+
 ## Run Tests and aggressively Auto Format Pep8
+
 (ignores some line length reports)
+
 - `$ sh format_and_test.sh`
 
 ## Docker
@@ -49,4 +52,3 @@
 ## Auto-Documentation to view api endpoints and params
 
 once server started go to `/redoc` for redoc documentation or `/docs` for interactive swagger ui documentation
-

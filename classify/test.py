@@ -31,8 +31,8 @@ def train_predict_svm_test(train, pred, metrics, target, **kwargs):
     train_pred_set = create_fake_data(train, pred, metrics, target)
     train_df = train_pred_set["train_df"]
     predict_df = train_pred_set["predict_df"]
-    train_frac = train_df.sample(frac=0.7, random_state=1)
-    test_frac = train_df.sample(frac=0.3, random_state=1)
+    train_frac = train_df.sample(frac=0.5, random_state=1)
+    test_frac = train_df.sample(frac=0.5, random_state=1)
 
     svm_obj = svm_predict_test(
         train_frac[metrics],
@@ -43,10 +43,10 @@ def train_predict_svm_test(train, pred, metrics, target, **kwargs):
     svm_model_accuracy = svm_obj["accuracy"]
     prediction_probabilities = svm_model.predict_proba(
         predict_df[metrics])
-    predict_df[[f"prob_yes_{target}"]] = [round(prob[1], 4)
-                                          for prob in prediction_probabilities]
-    predict_df[[f"prob_no_{target}"]] = [round(prob[0], 4)
-                                         for prob in prediction_probabilities]
+    predict_df[[f"prob_yes_{target}"]] = [
+        prob[1] for prob in prediction_probabilities]
+    predict_df[[f"prob_no_{target}"]] = [
+        prob[0] for prob in prediction_probabilities]
     predict_df["action_group"] = predict_df.apply(
         lambda x: combine_good_cols(x[predict_df[metrics].columns]), axis=1)
     prob_df = predict_df.groupby("action_group").mean().sort_values(
