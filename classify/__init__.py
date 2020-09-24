@@ -56,12 +56,18 @@ class Classifier:
             phi_list.append(phi)
             p_list.append(pbs.pvalue)
             Xcols.append(col)
-        return pd.DataFrame({"metric": Xcols,
-                             "importance": tree_info,
-                             "phi_correlation": phi_list,
-                             "biserial_correlation": ptb_corr_list,
-                             "p_value": p_list,
-                             "target": [y_col] * len(Xcols)}).sort_values(by="phi_correlation", ascending=False).to_dict(orient="records")
+        return pd.DataFrame(
+            {
+                "metric": Xcols,
+                "importance": tree_info,
+                "phi_correlation": phi_list,
+                "biserial_correlation": ptb_corr_list,
+                "p_value": p_list,
+                "target": [y_col] *
+                len(Xcols)}).sort_values(
+            by="phi_correlation",
+            ascending=False).to_dict(
+                orient="records")
 
     def knn_best(self, ks):
         test_train = self.get_inputs()
@@ -94,7 +100,12 @@ class Classifier:
                             probability=probability, **kwargs)
         svm_model.fit(X_train, y_train)
         yhat = svm_model.predict(X_test)
-        return {"svm_model": svm_model, "svm_yhat": yhat, "accuracy": metrics.accuracy_score(y_test, yhat)}
+        return {
+            "svm_model": svm_model,
+            "svm_yhat": yhat,
+            "accuracy": metrics.accuracy_score(
+                y_test,
+                yhat)}
 
 
 def combine_good_cols(row):
@@ -105,7 +116,16 @@ def combine_good_cols(row):
     return str(good_cols)
 
 
-def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="email", trash_col="Unnamed", **kwargs):
+def train_predict_svm_io(
+        train_csv,
+        predict_csv,
+        y,
+        train_size=0.9,
+        ir_col="email",
+        trash_col="Unnamed",
+        **kwargs):
+    train_csv = pd.read_csv(train_csv)
+    predict_csv = pd.read_csv(predict_csv)
     test_size = 1 - train_size
     clean_cols_train = [
         col for col in train_csv.columns if trash_col not in col]
@@ -125,18 +145,18 @@ def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="emai
         return predict_input_df.to_dict(orient="records")
     else:
         input_prediction = svm_model.predict_proba(predict_input_df)
-        predict_input_df[[f"prob_yes_{y}"]], predict_input_df[[f"prob_no_{y}"]] = [prob[1] for prob in
-                                                                                   input_prediction], [prob[0] for prob
-                                                                                                       in
-                                                                                                       input_prediction]
+        predict_input_df[[f"prob_yes_{y}"]], predict_input_df[[f"prob_no_{y}"]] = [
+            prob[1] for prob in input_prediction], [prob[0] for prob in input_prediction]
         predict_input_df["action_group"] = predict_input_df.apply(
             lambda x: combine_good_cols(x[train_obj.get_inputs()["X"].columns]), axis=1)
         prob_col = f'{kwargs.get("prob_col")}_{y}'
-        prob_df = predict_input_df.groupby("action_group").mean().sort_values(by=prob_col, ascending=False)[
-            [f"prob_yes_{y}",
-             f"prob_no_{y}"]]
-        model_output = {"model_accuracy": svm_model_accuracy,
-                        "results": prob_df.reset_index(level="action_group").to_dict(orient="records")}
+        prob_df = predict_input_df.groupby("action_group").mean().sort_values(
+            by=prob_col, ascending=False)[[f"prob_yes_{y}", f"prob_no_{y}"]]
+        model_output = {
+            "model_accuracy": svm_model_accuracy,
+            "results": prob_df.reset_index(
+                level="action_group").to_dict(
+                orient="records")}
         # if needed get decision array --> need to reshape
         if kwargs.get("decision"):
             model_output["decision_eval"] = list(
@@ -145,9 +165,22 @@ def train_predict_svm_io(train_csv, predict_csv, y, train_size=0.9, ir_col="emai
         return model_output
 
 
-def svm_predict_test(X_train, y_train, X_test, y_test, kernel="rbf", gamma=4, probability=True, **kwargs):
+def svm_predict_test(
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        kernel="rbf",
+        gamma=4,
+        probability=True,
+        **kwargs):
     svm_model = svm.SVC(kernel=kernel, gamma=gamma,
                         probability=probability, **kwargs)
     svm_model.fit(X_train, y_train)
     yhat = svm_model.predict(X_test)
-    return {"svm_model": svm_model, "svm_yhat": yhat, "accuracy": metrics.accuracy_score(y_test, yhat)}
+    return {
+        "svm_model": svm_model,
+        "svm_yhat": yhat,
+        "accuracy": metrics.accuracy_score(
+            y_test,
+            yhat)}

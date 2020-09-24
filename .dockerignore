@@ -2,6 +2,7 @@ dealenv2
 .dockerignore
 .gitignore
 run.sh
+run_format_test.py
 Dockerfile
 **/__pycache__
 *.pyc

@@ -33,6 +33,9 @@
   - `$ pip install -r requirements.txt`
 - for local running:
   - from root of project dir `$ sh run.sh`
+## Run Tests and aggressively Auto Format Pep8
+(ignores some line length reports)
+- `$ sh format_and_test.sh`
 
 ## Docker
 
@@ -46,3 +49,4 @@
 ## Auto-Documentation to view api endpoints and params
 
 once server started go to `/redoc` for redoc documentation or `/docs` for interactive swagger ui documentation
+
