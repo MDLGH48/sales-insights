@@ -2,7 +2,7 @@ import random
 import string
 import pandas as pd
 import numpy as np
-from . import svm_predict_test, combine_good_cols
+from . import svm_predict_test, combine_good_cols, Classifier
 
 
 def random_char(y):
@@ -59,3 +59,13 @@ def train_predict_svm_test(train, pred, metrics, target, **kwargs):
             orient="records")}
 
     return model_output
+
+
+def correlationTest(input_size, metrics, target):
+    input_df = create_random_df(input_size, metrics, target)
+    classifier_obj = Classifier(
+        df=input_df, y=target, ir_col="email", test_size=None)
+    return {
+        "correlations": classifier_obj.get_corr(),
+        "pred_power": classifier_obj.get_predictors()
+    }

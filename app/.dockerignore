@@ -4,5 +4,6 @@ dealenv2
 run.sh
 run_format_test.py
 Dockerfile
-**/__pycache__
+/app/__pycache__
 *.pyc
+/app/tests_and_format/*

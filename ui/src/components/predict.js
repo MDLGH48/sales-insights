@@ -1,6 +1,7 @@
-// const BASE_URL = "https://localhost:8000";
-const { useState, useEffect } = React;
-const {
+import React, { useState, useEffect } from "react";
+import "../App.css";
+import axios from "axios";
+import {
   Typography,
   makeStyles,
   Box,
@@ -9,29 +10,23 @@ const {
   List,
   ListItem,
   ListItemText,
-  DeleteIcon,
   Grid,
   Container,
-  SvgIcon,
-  Link,
   Slider,
   Slide,
   Modal,
   Backdrop,
   Fade,
-  CircularProgress,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-} = MaterialUI;
+} from "@material-ui/core";
+import NivoPredBar from "./nivoPredBar";
 
 const useStyles = makeStyles((theme) => ({
-  root: { flexGrow: 1, textAlign: "center", overflowY: "hidden" },
+  root: {
+    flexGrow: 1,
+    textAlign: "center",
+    overflowY: "hidden",
+    paddingTop: "5%",
+  },
   listMetrics: { overflow: "scroll", width: "100%" },
   appBar: {
     position: "relative",
@@ -50,12 +45,11 @@ const useStyles = makeStyles((theme) => ({
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
-    maxWidth: "70vw",
-    // maxHeight: "70vh",
-    // overflow: "scroll",
+    Width: "100vw",
+    Height: "90vh",
   },
   container: {
-    maxHeight: 600,
+    maxHeight: "90vh",
   },
 }));
 
@@ -77,7 +71,7 @@ const postRequest = async (url, payload) => {
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-function App() {
+function Predict() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -134,7 +128,7 @@ function App() {
       metrics: metrics,
       target: target,
     };
-    const resp = await postRequest("/test/prediction", payload);
+    const resp = await postRequest("/dtapi/test/prediction", payload);
     setPredData(resp);
     setLoading(false);
     setOpen(true);
@@ -165,6 +159,7 @@ function App() {
 
   return (
     <div className={classes.root}>
+      <Typography variant="h2"> Predict Action Groups</Typography>
       <Container maxWidth="sm">
         <Grid
           container
@@ -231,7 +226,8 @@ function App() {
               <List className={classes.listMetrics}>
                 {metrics.map((listItem, index) => (
                   <ListItem key={index}>
-                    <ListItemText primary={listItem}></ListItemText>
+                    <ListItemText
+                      primary={listItem.replace(/_/g, " ")}></ListItemText>
                     <Button
                       onClick={() => deleteMetric(listItem)}
                       variant="contained"
@@ -255,6 +251,7 @@ function App() {
                 label="target"
                 onChange={handleTarget}></TextField>
             </Box>
+
             <Box
               display="flex"
               justifyContent="center"
@@ -289,55 +286,14 @@ function App() {
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
-          timeout: 500,
+          timeout: 200,
         }}>
         <Fade in={open}>
           <div className={classes.paperModal}>
-            <TableContainer className={classes.container}>
-              <Table stickyHeader aria-label="sticky table">
-                <TableHead>
-                  <TableRow>
-                    {Object.keys(predData.results[0]).map((key) => (
-                      <TableCell key={key.index}>{key}</TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {predData.results
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      return (
-                        <TableRow hover tabIndex={-1} key={row.index}>
-                          {Object.keys(predData.results[0]).map((key) => {
-                            const value = row[key];
-                            return (
-                              <TableCell
-                                key={key.index}
-                                align={key.align}
-                                style={{
-                                  color: "black",
-                                  backgroundColor: `rgba(242, 120, 75, ${value})`,
-                                }}>
-                                {key.format && typeof value === "number"
-                                  ? key.format(value)
-                                  : value}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={predData.results.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
+            <NivoPredBar
+              style={{ borderColor: "1px solid red" }}
+              predData={predData.results}
+              target={target}
             />
           </div>
         </Fade>
@@ -345,10 +301,4 @@ function App() {
     </div>
   );
 }
-
-ReactDOM.render(
-  <React.Fragment>
-    <App />
-  </React.Fragment>,
-  document.querySelector("#root")
-);
+export default Predict;

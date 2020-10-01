@@ -1,18 +1,19 @@
 # todo logging
 # todo makeFaster (caching?)
+import uvicorn
 import json
 from typing import Optional, List
 import pandas as pd
 from fastapi import FastAPI, Body, File, UploadFile, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from classify import Classifier, train_predict_svm_io
-from classify.test import create_random_df, train_predict_svm_test
+from classify.test import create_random_df, train_predict_svm_test, correlationTest
 from pydantic import BaseModel
 
+app = FastAPI(title='FastDeal', version='1.0',
+              description='analytics api')
 
-class TestRandom(BaseModel):
+
+class TestRandomPred(BaseModel):
     train: int
     pred: int
     metrics: List[str]
@@ -20,26 +21,30 @@ class TestRandom(BaseModel):
     trash: Optional[str] = None
 
 
-app = FastAPI(title='FastDeal', version='1.0',
-              description='analytics api')
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
-
-
-@app.get("/", response_class=HTMLResponse)
-def main(request: Request):
-    return templates.TemplateResponse(
-        "index.html", {"request": request})
+class TestRandomCorr(BaseModel):
+    input_size: int
+    metrics: List[str]
+    target: str
 
 
-@app.post("/test/prediction")
-def test(testObj: TestRandom):
+@app.get("/dtapi/")
+def main():
+    return {"message": "dealtale api"}
+
+
+@app.post("/dtapi/test/prediction")
+def test(testObj: TestRandomPred):
     print(dict(testObj))
     return train_predict_svm_test(**dict(testObj))
 
 
-@app.post("/prediction")
+@app.post("/dtapi/test/correlation")
+def test_corr(testObj: TestRandomCorr):
+    print(dict(testObj))
+    return {"results": correlationTest(**dict(testObj))}
+
+
+@app.post("/dtapi/prediction")
 def prediction(target: str,
                train_csv: UploadFile = File(...),
                predict_csv: UploadFile = File(...)):
@@ -56,7 +61,7 @@ def prediction(target: str,
     }
 
 
-@app.post("/corr")
+@app.post("/dtapi/corr")
 def corr(metric: str,
          input_csv: UploadFile = File(...)):
     classifier_obj = Classifier(df=pd.read_csv(input_csv.file),
@@ -68,3 +73,7 @@ def corr(metric: str,
             "correlations": classifier_obj.get_corr(),
             "pred_power": classifier_obj.get_predictors()}
     }
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", port=8000, reload=True)
