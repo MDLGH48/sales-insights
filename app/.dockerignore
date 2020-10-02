@@ -1,9 +1,6 @@
 dealenv2
 .dockerignore
 .gitignore
-run.sh
-run_format_test.py
 Dockerfile
 /app/__pycache__
 *.pyc
-/app/tests_and_format/*

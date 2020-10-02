@@ -7,7 +7,7 @@ client = TestClient(main.app)
 
 def test_index():
     response = client.get("/dtapi/")
-    assert response.status_code == 200
+    assert response.status_code == 200, f'response error ={response.json()["detail"]}'
 
 
 def test_front_end_dash_predict():
@@ -17,16 +17,13 @@ def test_front_end_dash_predict():
         "metrics": ["a", "b"],
         "target": "c"}
     response = client.post('/dtapi/test/prediction', json=test_payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f'response error ={response.json()["detail"]}'
 
 
 def test_front_end_dash_corr():
-    test_payload = {
-        "input_size": 1000,
-        "metrics": ["a", "b"],
-        "target": "c"}
+    test_payload = {"input_size": 1000, "metrics": ["a", "b"], "target": "c"}
     response = client.post('/dtapi/test/correlation', json=test_payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f'response error ={response.json()["detail"]}'
 
 
 def test_prediction_io():
@@ -47,7 +44,7 @@ def test_prediction_io():
                 "filename",
                 test_p,
                 "csv")})
-    assert response.status_code == 200
+    assert response.status_code == 200, f'response error ={response.json()["detail"]}'
 
 
 def test_corr_io():
@@ -62,4 +59,4 @@ def test_corr_io():
                     'app/app/tests_and_format/pytest_data/test_input.csv',
                     'rb'),
                 "csv")})
-    assert response.status_code == 200
+    assert response.status_code == 200, f'response error ={response.json()["detail"]}'

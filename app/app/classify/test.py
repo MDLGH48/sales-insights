@@ -16,9 +16,9 @@ def create_random_df(size, Xcols, ycol):
     print(Xcols)
     for col in Xcols:
         fake_df[col] = list(np.random.choice(
-            [1, 0], df_size, p=[3 / 7, 4 / 7]))
+            [1, 0], df_size, p=[6 / 10, 4 / 10]))
     fake_df[ycol] = list(np.random.choice(
-        [1, 0], df_size, p=[3 / 7, 4 / 7]))
+        [1, 0], df_size, p=[6 / 10, 4 / 10]))
     return fake_df
 
 

@@ -1,7 +1,5 @@
-FROM tiangolo/uvicorn-gunicorn:python3.7
-RUN pip install -r requirements.txt
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+
 COPY ./app /app
-
-
-
+# RUN pip install -r requirements.txt
 ENV PORT=8000

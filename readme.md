@@ -1,13 +1,26 @@
-# Dealtale api
+# Dealtale Analytics app/API
 
 ## Built with
+
+#### Back End:
 
 - FastApi <https://fastapi.tiangolo.com/>
 - pandas <https://pandas.pydata.org/>
 - scikitlearn <https://scikit-learn.org/stable/>
 - SciPy <https://docs.scipy.org/doc/scipy/reference/>
 
-## description
+#### Front End:
+
+- React JS (Create react app <https://reactjs.org/docs/create-a-new-react-app.html#create-react-app>) <https://reactjs.org/>
+- Material UI <https://material-ui.com/>
+- Nivo Charting lib <https://nivo.rocks/>
+
+# description
+
+## NEW:
+
+- play with classification and correlation models via React front end
+- live and deployed on http://fatdealv1.francecentral.azurecontainer.io
 
 ### 1. **_measure the correlation/importance of relationship between each `metric X` and `target Y ` for one-hot encoded dataset (0,1)_** using
 
@@ -23,24 +36,35 @@
 
 - Python == `python 3.7`
 
-### from root of proj dir
+  _from root of proj dir_
 
 - install virtual env
-  - `$ virtualenv myenv`
+  `$ virtualenv env`
 - activate virtual env
-  - `$ source myenv/bin/activate`
+  `$ source env/bin/activate`
 - install packages in virtual env
-  - `$ pip install -r requirements.txt`
-- for local running:
-  - from root of project dir `$ sh run.sh`
+  `$ pip install -r app/requirements.txt`
+
+#### install ui dependencies
+
+##### - make sure to install node modules inside `ui` directory
+
+`yarn --cwd ./ui . `
+
+### for local running:
+
+- to double check style and all routes before running locally (good for pre deployment \*_just need to add jest_ ) `$ python run_local.py`
+- `$ sh run.sh`
 
 ## Run Tests and aggressively Auto Format Pep8
 
-(ignores some line length reports)
+(ignores E501 line length reports but tries to adhere to shortening lines as much as possible)
 
 - `$ sh format_and_test.sh`
 
 ## Docker
+
+### UPDATE : working on docker compose to integrate React frontend to fastapi backend
 
 - Build image from Dockerfile
   - `docker build -t <image_name> .`

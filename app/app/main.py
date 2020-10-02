@@ -48,14 +48,8 @@ def test_corr(testObj: TestRandomCorr):
 def prediction(target: str,
                train_csv: UploadFile = File(...),
                predict_csv: UploadFile = File(...)):
-    pred_dict = train_predict_svm_io(
-        train_csv.file,
-        predict_csv.file,
-        target,
-        train_size=0.9,
-        ir_col="email",
-        trash_col="Unnamed",
-        prob_col="prob_yes")
+    pred_dict = train_predict_svm_io(train_csv.file, predict_csv.file, target,
+                                     train_size=0.9, ir_col="email", trash_col="Unnamed", prob_col="prob_yes")
     return {
         "response": pred_dict
     }

@@ -1,2 +1,3 @@
 #! /bin/sh
-./dealenv2/bin/python3.7 ./app/app/main.py  & yarn --cwd ./ui start
+sh format_and_test.sh
+python ./app/app/main.py  & yarn --cwd ./ui start
