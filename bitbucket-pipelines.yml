@@ -3,6 +3,6 @@ pipelines:
   default:
     - step:
         script:
-          - pip install -r app/requirements.txt
-          - python app/app/test.py
+          - pip install -r backend/requirements.txt
+          - python backend/app/test.py
           - pycodestyle --exclude='venv,dealenv,dealenv2' --ignore E501 .
