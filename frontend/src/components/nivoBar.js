@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { ResponsiveBar } from "@nivo/bar";
 
 function NivoBarCorr(props) {
-  const cData = props.chartData.results.correlations.map((x) => {
+  const cData = props.chartData.response.correlations.map((x) => {
     const vizData = {};
-    vizData["biserial_correlation"] = (x["biserial_correlation"] * 100).toFixed(
-      1
-    );
+    // vizData["biserial_correlation"] = (x["biserial_correlation"] * 100).toFixed(
+    //   1
+    // );
     vizData["importance"] = (x["importance"] * 100).toFixed(1);
     vizData["metric"] = x["metric"].replace(/_/g, " ");
-    vizData["p_value"] = (1 - x["p_value"]) * 100;
+    vizData["p_value"] = x["p_value"].toFixed(1);
     vizData["phi_correlation"] = (x["phi_correlation"] * 100).toFixed(1);
     vizData["target"] = x["target"];
     return vizData;

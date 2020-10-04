@@ -13,7 +13,6 @@ import {
   Grid,
   Container,
   Slider,
-  Slide,
   Modal,
   Backdrop,
   Fade,
@@ -68,21 +67,8 @@ const postRequest = async (url, payload) => {
     console.error(e);
   }
 };
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+
 function Predict() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);

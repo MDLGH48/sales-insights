@@ -14,14 +14,15 @@ import {
   Grid,
   Container,
   Slider,
-  Slide,
+  InputLabel,
   Modal,
   Backdrop,
   Fade,
+  Select,
+  MenuItem,
 } from "@material-ui/core";
 import InfoBar from "./infoBar.js";
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
+
 import CardContent from "@material-ui/core/CardContent";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import LiveHelpIcon from "@material-ui/icons/LiveHelp";
@@ -140,9 +141,7 @@ const postRequest = async (url, payload) => {
     console.error(e);
   }
 };
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+
 function Correlate() {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
@@ -150,34 +149,7 @@ function Correlate() {
   const handleClose = () => {
     setOpen(false);
   };
-  const [fileObj, setfileObj] = useState(null);
-  //  I should probably use objects to handle state here... will change
-  const onFileChange = (event) => {
-    setfileObj(event.target.file);
-  };
-  const getCorrelationIO = async () => {
-    setSeconds(0);
-    setLoading(true);
-    const payload = {
-      metric: target,
-      input_csv: dataSetSize,
-    };
-    const resp = await postRequest("/dtapi/test/correlation", payload);
-    console.log(resp);
-    setPredData(resp);
-    setLoading(false);
-    setOpen(true);
-  };
-  const onFileUpload = () => {
-    // Create an object of formData
-    const formData = new FormData();
 
-    // Update the formData object
-    formData.append("input_csv", fileObj);
-
-    // Details of the uploaded file
-    console.log(fileObj);
-  };
   const [dataSetSize, setTrainSize] = useState(1000);
   const [metrics, setMetrics] = useState([
     "hubspot_contact_paid_search",
@@ -191,8 +163,8 @@ function Correlate() {
     "salesforce_opportunity",
   ]);
   const [target, setTarget] = useState("salesforce_opportunity");
-  const [corrData, setPredData] = useState({
-    results: {
+  const [corrData, setCorrData] = useState({
+    response: {
       correlations: [
         {
           biserial_correlation: 0,
@@ -205,7 +177,11 @@ function Correlate() {
       ],
     },
   });
+  const [fileObj, setfileObj] = useState(null);
 
+  const onFileChange = (event) => {
+    setfileObj(event.target.files[0]);
+  };
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
@@ -217,7 +193,7 @@ function Correlate() {
     };
   }, []);
 
-  const getCorrelation = async () => {
+  const getCorrelationRandom = async () => {
     setSeconds(0);
     setLoading(true);
     const payload = {
@@ -227,10 +203,28 @@ function Correlate() {
     };
     const resp = await postRequest("/dtapi/test/correlation", payload);
     console.log(resp);
-    setPredData(resp);
+    setCorrData(resp);
     setLoading(false);
     setOpen(true);
   };
+  const [targetError, setTargetError] = useState({ error: false, hint: [] });
+  const getCorrelationCSV = async () => {
+    setSeconds(0);
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("input_csv", fileObj);
+    const resp = await postRequest(`/dtapi/corr?metric=${target}`, formData);
+    console.log(resp);
+    if (resp.response === "target error") {
+      setTargetError({ error: true, hint: resp.hint });
+    } else {
+      setCorrData(resp);
+      setTargetError({ error: false, hint: [] });
+      setLoading(false);
+      setOpen(true);
+    }
+  };
+
   const [metricInputVal, setMetricInputVal] = useState("");
   // need to make more generic.. same function over again
   const handleTrainSliderChange = (event, newVal) => {
@@ -254,6 +248,10 @@ function Correlate() {
 
   return (
     <div className={classes.root}>
+      {" "}
+      <Grid item>
+        <InfoBar icon={<LiveHelpIcon />} content={<Explain />} />
+      </Grid>
       <Grid
         container
         spacing={2}
@@ -263,9 +261,6 @@ function Correlate() {
         <Grid item>
           {" "}
           <Typography variant="h2">Correlations</Typography>
-        </Grid>
-        <Grid item>
-          <InfoBar icon={<LiveHelpIcon />} content={<Explain />} />
         </Grid>
       </Grid>
       <Container maxWidth="sm">
@@ -301,9 +296,40 @@ function Correlate() {
               </Button>
             </Grid>
           </Grid>
+          <Box
+            display="flex"
+            justifyContent="center"
+            flexWrap="wrap"
+            style={{ padding: "20px" }}>
+            <TextField
+              variant="outlined"
+              value={target}
+              style={{ width: "100%" }}
+              label="target"
+              onChange={handleTarget}></TextField>
+          </Box>
           <Switch>
             <Route path="/correlateTest/file">
-              {" "}
+              {targetError.error && (
+                <>
+                  <InputLabel id="error">
+                    Incorrect target input please choose from the following...
+                  </InputLabel>
+                  <Box display="flex" justifyContent="center" flexWrap="wrap">
+                    <Select
+                      labelId="error"
+                      id="errorSelect"
+                      onChange={handleTarget}>
+                      {targetError.hint.map((column, index) => (
+                        <MenuItem key={index} value={column}>
+                          {column}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Box>
+                </>
+              )}
+
               <Grid
                 container
                 spacing={3}
@@ -311,32 +337,29 @@ function Correlate() {
                 alignItems="center"
                 justify="center"
                 style={{ minHeight: "40vh", marginTop: "5vh" }}>
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  id="contained-button-file"
-                  single
-                  onChange={onFileChange}
-                  type="file"
-                />
-                <label htmlFor="contained-button-file">
-                  <Grid item>
-                    <Box display="flex" justifyContent="center" flexWrap="wrap">
-                      <Button
-                        variant="contained"
-                        startIcon={<CloudUploadIcon />}>
-                        Upload CSV
-                      </Button>
-                    </Box>
-                  </Grid>
-                </label>{" "}
                 <Grid item>
-                  {" "}
+                  <Box display="flex" justifyContent="center" flexWrap="wrap">
+                    <Button
+                      variant="contained"
+                      component="label"
+                      startIcon={<CloudUploadIcon />}>
+                      Upload CSV
+                      <input
+                        accept="*"
+                        style={{ display: "none" }}
+                        onChange={onFileChange}
+                        type="file"
+                      />{" "}
+                    </Button>
+                  </Box>
+                </Grid>
+
+                <Grid item>
                   <Button
                     variant="contained"
                     size="large"
                     color="primary"
-                    onClick={getCorrelation}>
+                    onClick={getCorrelationCSV}>
                     GO
                   </Button>
                 </Grid>
@@ -410,18 +433,7 @@ function Correlate() {
                       ))}
                     </List>
                   </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    flexWrap="wrap"
-                    style={{ padding: "20px" }}>
-                    <TextField
-                      variant="outlined"
-                      value={target}
-                      style={{ width: "100%" }}
-                      label="target"
-                      onChange={handleTarget}></TextField>
-                  </Box>
+
                   <Box
                     display="flex"
                     justifyContent="center"
@@ -439,7 +451,7 @@ function Correlate() {
                         variant="contained"
                         size="large"
                         color="primary"
-                        onClick={getCorrelation}>
+                        onClick={getCorrelationRandom}>
                         GO
                       </Button>
                     </Box>
@@ -465,7 +477,7 @@ function Correlate() {
           <div className={classes.paperModal}>
             <Typography variant="h3">
               metric correlations to{" "}
-              {corrData.results.correlations[0].target.replace("_", " ")}
+              {corrData.response.correlations[0].target.replace("_", " ")}
             </Typography>
             <NivoBarCorr chartData={corrData} />
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./App.css";
 import Correlate from "./components/correlate";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";

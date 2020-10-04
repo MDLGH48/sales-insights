@@ -41,7 +41,7 @@ def test(testObj: TestRandomPred):
 @app.post("/dtapi/test/correlation")
 def test_corr(testObj: TestRandomCorr):
     print(dict(testObj))
-    return {"results": correlationTest(**dict(testObj))}
+    return {"response": correlationTest(**dict(testObj))}
 
 
 @app.post("/dtapi/prediction")
@@ -58,15 +58,21 @@ def prediction(target: str,
 @app.post("/dtapi/corr")
 def corr(metric: str,
          input_csv: UploadFile = File(...)):
-    classifier_obj = Classifier(df=pd.read_csv(input_csv.file),
-                                y=metric,
-                                ir_col="email",
-                                test_size=None)
-    return {
-        "response": {
-            "correlations": classifier_obj.get_corr(),
-            "pred_power": classifier_obj.get_predictors()}
-    }
+    df = pd.read_csv(input_csv.file)
+    columns = list(df.columns)
+    if metric not in columns:
+        return {"response": "target error", "hint": columns}
+    else:
+        classifier_obj = Classifier(df=df,
+                                    y=metric,
+                                    ir_col="email",
+                                    test_size=None)
+
+        return {
+            "response": {
+                "correlations": classifier_obj.get_corr(),
+                "pred_power": classifier_obj.get_predictors()}
+        }
 
 
 if __name__ == "__main__":
