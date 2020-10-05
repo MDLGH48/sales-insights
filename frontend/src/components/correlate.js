@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import "../App.css";
-import axios from "axios";
+import axRequest from "./proxyMod";
 import {
   Typography,
   makeStyles,
@@ -126,21 +126,6 @@ function Explain() {
     </CardContent>
   );
 }
-const postRequest = async (url, payload) => {
-  try {
-    const response = await axios({
-      method: "post",
-      url: url,
-      data: payload,
-    });
-
-    const responseData = response.data;
-
-    return responseData;
-  } catch (e) {
-    console.error(e);
-  }
-};
 
 function Correlate() {
   const classes = useStyles();
@@ -201,7 +186,7 @@ function Correlate() {
       metrics: metrics,
       target: target,
     };
-    const resp = await postRequest("/dtapi/test/correlation", payload);
+    const resp = await axRequest("test/correlation", payload, "post");
     console.log(resp);
     setCorrData(resp);
     setLoading(false);
@@ -213,7 +198,7 @@ function Correlate() {
     setLoading(true);
     const formData = new FormData();
     formData.append("input_csv", fileObj);
-    const resp = await postRequest(`/dtapi/corr?metric=${target}`, formData);
+    const resp = await axRequest(`corr?metric=${target}`, formData, "post");
     console.log(resp);
     if (resp.response === "target error") {
       setTargetError({ error: true, hint: resp.hint });

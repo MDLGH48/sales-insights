@@ -2,7 +2,20 @@ import os
 import main
 from fastapi.testclient import TestClient
 from classify.test import create_random_df
+import http.client
 client = TestClient(main.app)
+
+
+conn = http.client.HTTPSConnection(
+    '2dd33028c81a9cc481512d0cc69f028f.m.pipedream.net')
+conn.request("POST", '/', '{"message":"May the force be with you."}', {
+    'Content-Type': 'application/json',
+})
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))
 
 
 def test_index():

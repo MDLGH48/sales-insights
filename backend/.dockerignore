@@ -1,8 +1,0 @@
-dealenv2
-.dockerignore
-.gitignore
-Dockerfile
-/app/__pycache__
-*.pyc
-/app/test.py
-/app/tests_and_format

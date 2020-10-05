@@ -5,12 +5,27 @@ import json
 from typing import Optional, List
 import pandas as pd
 from fastapi import FastAPI, Body, File, UploadFile, Request
+from fastapi.middleware.cors import CORSMiddleware
 from classify import Classifier, train_predict_svm_io
 from classify.test import create_random_df, train_predict_svm_test, correlationTest
 from pydantic import BaseModel
 
 app = FastAPI(title='FastDeal', version='1.0',
               description='analytics api')
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://localhost:8080",
+    "http://localhost:1337"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class TestRandomPred(BaseModel):
@@ -27,37 +42,37 @@ class TestRandomCorr(BaseModel):
     target: str
 
 
-@app.get("/dtapi/")
-def main():
+@app.get("/api/main")
+def main(request: Request):
     return {"message": "dealtale api"}
 
 
-@app.post("/dtapi/test/prediction")
-def test(testObj: TestRandomPred):
+@app.post("/api/test/prediction")
+def test(request: Request, testObj: TestRandomPred):
     print(dict(testObj))
     return train_predict_svm_test(**dict(testObj))
 
 
-@app.post("/dtapi/test/correlation")
-def test_corr(testObj: TestRandomCorr):
+@app.post("/api/test/correlation")
+def test_corr(request: Request, testObj: TestRandomCorr):
     print(dict(testObj))
     return {"response": correlationTest(**dict(testObj))}
 
 
-@app.post("/dtapi/prediction")
-def prediction(target: str,
+@app.post("/api/prediction")
+def prediction(request: Request, target: str,
                train_csv: UploadFile = File(...),
-               predict_csv: UploadFile = File(...)):
+               predict_csv: UploadFile = File(...),
+               ):
     pred_dict = train_predict_svm_io(train_csv.file, predict_csv.file, target,
                                      train_size=0.9, ir_col="email", trash_col="Unnamed", prob_col="prob_yes")
-    return {
-        "response": pred_dict
-    }
+    return {"response": pred_dict}
 
 
-@app.post("/dtapi/corr")
-def corr(metric: str,
-         input_csv: UploadFile = File(...)):
+@ app.post("/api/corr")
+def corr(request: Request, metric: str,
+         input_csv: UploadFile = File(...),
+         ):
     df = pd.read_csv(input_csv.file)
     columns = list(df.columns)
     if metric not in columns:
@@ -73,7 +88,3 @@ def corr(metric: str,
                 "correlations": classifier_obj.get_corr(),
                 "pred_power": classifier_obj.get_predictors()}
         }
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", port=8000, reload=True)

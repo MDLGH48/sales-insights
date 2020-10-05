@@ -47,6 +47,8 @@
 
 #### install ui dependencies
 
+--> to run backend and front end locally with hot reloading make sure to add `"proxy": "http://localhost:8000"` to `package.json`
+
 ##### - make sure to install node modules inside `ui` directory
 
 `yarn --cwd ./ui . `

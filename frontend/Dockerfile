@@ -1,16 +1,17 @@
-FROM node:latest
+FROM node:13.12.0-alpine as build
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --silent
+RUN npm install react-scripts@3.4.1 -g --silent
+COPY . ./
+RUN npm run build
 
-ADD package.json /package.json
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
 
-ENV NODE_PATH=/node_modules
-ENV PATH=$PATH:/node_modules/.bin
-RUN npm install
-
-WORKDIR /dtapp
-ADD . /dtapp
-
-EXPOSE 8000
-EXPOSE 35729
-
-ENTRYPOINT ["/bin/bash", "/app/run.sh"]
-CMD ["start"]
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
-import axios from "axios";
+import axRequest from "./proxyMod";
 import {
   Typography,
   makeStyles,
@@ -52,22 +52,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const postRequest = async (url, payload) => {
-  try {
-    const response = await axios({
-      method: "post",
-      url: url,
-      data: payload,
-    });
-    console.log(response);
-    const responseData = response.data;
-    console.log(responseData);
-    return responseData;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
 function Predict() {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
@@ -114,7 +98,7 @@ function Predict() {
       metrics: metrics,
       target: target,
     };
-    const resp = await postRequest("/dtapi/test/prediction", payload);
+    const resp = await axRequest("test/prediction", payload, "post");
     setPredData(resp);
     setLoading(false);
     setOpen(true);
