@@ -1,7 +1,7 @@
 # Dealtale Analytics app/API
 
 - front dash - <http://dtapi-dash.francecentral.azurecontainer.io/>
-- backend api - <http://dtapi.francecentral.azurecontainer.io/>
+- backend api - <http://dtapi.francecentral.azurecontainer.io/api/main>
 
 ### deployment
 
