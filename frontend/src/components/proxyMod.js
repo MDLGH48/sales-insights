@@ -4,7 +4,7 @@ const axRequest = async (url, payload, method) => {
   try {
     const response = await axios({
       method: "post",
-      url: `http://localhost:8000/api/${url}`,
+      url: `http://dtapi.francecentral.azurecontainer.io/api/${url}`,
       data: payload,
     });
 

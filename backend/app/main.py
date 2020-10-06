@@ -12,16 +12,9 @@ from pydantic import BaseModel
 
 app = FastAPI(title='FastDeal', version='1.0',
               description='analytics api')
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://localhost:8080",
-    "http://localhost:1337"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

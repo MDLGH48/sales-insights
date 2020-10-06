@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
   menuButton: { marginRight: theme.spacing(2) },
   title: { flexGrow: 1 },
 }));
-
+const apiHome = "http://dtapi.francecentral.azurecontainer.io";
 function NavBar(props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -53,12 +53,12 @@ function NavBar(props) {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}>
                 <MenuItem onClick={handleClose}>
-                  <Link href="http://localhost:8000/redoc" target="_blank">
+                  <Link href={`${apiHome}/redoc`} target="_blank">
                     Redoc
                   </Link>
                 </MenuItem>
                 <MenuItem onClick={handleClose}>
-                  <Link href="http://localhost:8000/docs" target="_blank">
+                  <Link href={`${apiHome}/docs`} target="_blank">
                     Swagger
                   </Link>
                 </MenuItem>

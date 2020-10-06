@@ -2,6 +2,7 @@ version: "3.7"
 services:
   frontend:
     container_name: frontend
+    image: dealtale.azurecr.io/fatdealapife
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -9,6 +10,7 @@ services:
       - 1337:80
   backend:
     container_name: backend
+    image: dealtale.azurecr.io/fatdealapi
     build:
       context: ./backend/app
       dockerfile: Dockerfile
