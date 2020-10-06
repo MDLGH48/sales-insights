@@ -19,5 +19,5 @@ def pep8_this_app(directories):
 
 
 if __name__ == '__main__':
-    directories = [".", './app/app/classify/']
+    directories = [".", 'backend/app/classify/']
     pep8_this_app(directories)

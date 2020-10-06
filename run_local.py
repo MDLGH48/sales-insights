@@ -8,7 +8,8 @@ def make_solid_run():
         f_test) if re.search('test session starts', item)][0] + 1):])
     if "fail" not in test_stream and "format issues" not in test_stream:
         print("passed style and testing \n starting app \n ----->\n\n")
-        os.system("python ./backend/app/main.py  & yarn --cwd ./ui start")
+        os.system(
+            "python ./backend/app/main.py  & yarn --cwd ./frontend start")
     else:
         print("\n".join(f_test))
 
