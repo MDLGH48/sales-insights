@@ -1,5 +1,16 @@
 # Dealtale Analytics app/API
 
+- front dash - <http://dtapi-dash.francecentral.azurecontainer.io/>
+- backend api - <http://dtapi.francecentral.azurecontainer.io/>
+
+### deployment
+
+- from root `$ docker-compose up --build -d`
+- `docker-compose push`(yml already pushes images to registry)
+- azure container registry - dealtale.azurecr.io
+- backend docker image `fatdealapi`
+- frontend docker image `fatdealapife`
+
 ## Built with
 
 #### Back End:
@@ -14,6 +25,7 @@
 - React JS (Create react app <https://reactjs.org/docs/create-a-new-react-app.html#create-react-app>) <https://reactjs.org/>
 - Material UI <https://material-ui.com/>
 - Nivo Charting lib <https://nivo.rocks/>
+- #### Frontend serving with ngnix
 
 # description
 
@@ -34,6 +46,20 @@
 
 ## Installation
 
+#
+
+#### install ui dependencies
+
+## Frontend
+
+##### - make sure to install node modules inside `frontend` directory
+
+`yarn --cwd ./frontend `
+
+#
+
+## Backend
+
 - Python == `python 3.7`
 
   _from root of proj dir_
@@ -45,18 +71,10 @@
 - install packages in virtual env
   `$ pip install -r app/requirements.txt`
 
-#### install ui dependencies
-
---> to run backend and front end locally with hot reloading make sure to add `"proxy": "http://localhost:8000"` to `package.json`
-
-##### - make sure to install node modules inside `ui` directory
-
-`yarn --cwd ./ui . `
-
 ### for local running:
 
-- to double check style and all routes before running locally (good for pre deployment \*_just need to add jest_ ) `$ python run_local.py`
-- `$ sh run.sh`
+- to double check style and all routes before running locally (good for pre deployment \*_just need to add jest_ )
+- `$ python run_local.py`
 
 ## Run Tests and aggressively Auto Format Pep8
 
@@ -64,17 +82,20 @@
 
 - `$ sh format_and_test.sh`
 
-## Docker
-
-### UPDATE : working on docker compose to integrate React frontend to fastapi backend
-
-- Build image from Dockerfile
-  - `docker build -t <image_name> .`
-- Run container in detatched mode ... bind port to `localhost:8000`
-  - `docker run -d -p 8000:80 <image_name>:<tag>`
-- or
-  - `docker run -d -p 80:80 <image_name>:<tag>`
-
 ## Auto-Documentation to view api endpoints and params
 
 once server started go to `/redoc` for redoc documentation or `/docs` for interactive swagger ui documentation
+
+#
+
+## Docker
+
+- frontend binds to port 1337 (ngnix) --see `frontend/nginx/nginx.conf` & `frontend/Dockerfile`
+- backend binds to port 8000
+
+##
+
+from root -- dev environment
+
+- `$ docker-compose -f docker-compose.dev.yml build`
+- `$ docker-compose -f docker-compose.dev.yml up` | `docker-compose -f docker-compose.dev.yml up --remove-orphans`
