@@ -26,7 +26,7 @@ import InfoBar from "./infoBar.js";
 import CardContent from "@material-ui/core/CardContent";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import LiveHelpIcon from "@material-ui/icons/LiveHelp";
-import NivoBarCorr from "./nivoBar";
+import NivoBarCorr from "./nivoCorrBar";
 
 const useStyles = makeStyles((theme) => ({
   root: {

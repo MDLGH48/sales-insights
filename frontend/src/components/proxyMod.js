@@ -3,7 +3,7 @@ import axios from "axios";
 const axRequest = async (url, payload, method) => {
   try {
     const response = await axios({
-      method: "post",
+      method: method,
       url: `http://dtapi.francecentral.azurecontainer.io/api/${url}`,
       data: payload,
     });
