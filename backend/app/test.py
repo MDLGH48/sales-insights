@@ -6,14 +6,8 @@ import http.client
 client = TestClient(main.app)
 
 
-res = conn.getresponse()
-data = res.read()
-
-print(data.decode("utf-8"))
-
-
 def test_index():
-    response = client.get("/api/")
+    response = client.get("/api/main")
     assert response.status_code == 200, f'response error ={response.json()["detail"]}'
 
 
@@ -38,8 +32,8 @@ def test_prediction_io():
         'backend/app/tests_and_format/pytest_data/test_t.csv', index=False)
     create_random_df(10, ["x1", "x2"], "y").to_csv(
         'backend/app/tests_and_format/pytest_data/test_p.csv', index=False)
-    test_t = open('app/app/tests_and_format/pytest_data/test_t.csv', 'rb')
-    test_p = open('app/app/tests_and_format/pytest_data/test_p.csv', 'rb')
+    test_t = open('backend/app/tests_and_format/pytest_data/test_t.csv', 'rb')
+    test_p = open('backend/app/tests_and_format/pytest_data/test_p.csv', 'rb')
     response = client.post(
         "/api/prediction?target=y",
         files={
@@ -63,7 +57,7 @@ def test_corr_io():
             "input_csv": (
                 "filename",
                 open(
-                    'app/app/tests_and_format/pytest_data/test_input.csv',
+                    'backend/app/tests_and_format/pytest_data/test_input.csv',
                     'rb'),
                 "csv")})
     assert response.status_code == 200, f'response error ={response.json()["detail"]}'
