@@ -1,4 +1,4 @@
-# Dealtale Analytics app/API
+# Sales Insights Analytics app/API
 
 
 ### deployment
