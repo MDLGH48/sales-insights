@@ -1,7 +1,5 @@
 # Dealtale Analytics app/API
 
-- front dash - <http://dtapi-dash.francecentral.azurecontainer.io/>
-- backend api - <http://dtapi.francecentral.azurecontainer.io/api/main>
 
 ### deployment
 
@@ -32,7 +30,7 @@
 ## NEW:
 
 - play with classification and correlation models via React front end
-- live and deployed on http://fatdealv1.francecentral.azurecontainer.io
+- live and deployed 
 
 ### 1. **_measure the correlation/importance of relationship between each `metric X` and `target Y ` for one-hot encoded dataset (0,1)_** using
 
