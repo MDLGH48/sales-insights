@@ -5,9 +5,9 @@
 
 - from root `$ docker-compose up --build -d`
 - `docker-compose push`(yml already pushes images to registry)
-- azure container registry - dealtale.azurecr.io
-- backend docker image `fatdealapi`
-- frontend docker image `fatdealapife`
+- azure container registry - foobar.azurecr.io
+- backend docker image `foobarbe`
+- frontend docker image `foobarfe`
 
 ## Built with
 
